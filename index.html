@@ -1,1239 +1,763 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEON//ARCHIVE</title>
-<link rel="icon" type="image/png" href="favicon.png">
-
-<style>
-* {
-    box-sizing: border-box;
-}
-
-:root {
-    --bg: #07090d;
-    --panel: #10141c;
-    --panel2: #171d27;
-    --border: #2c3747;
-    --text: #e9eef5;
-    --muted: #8290a3;
-    --accent: #55f6b2;
-    --danger: #ff5577;
-    --blue: #5ca9ff;
-}
-
-body {
-    margin: 0;
-    overflow: hidden;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-/* BOOT SCREEN */
-
-#boot {
-    position: fixed;
-    inset: 0;
-    background: #030405;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: monospace;
-}
-
-.bootBox {
-    width: 500px;
-    max-width: 90%;
-}
-
-.bootTitle {
-    color: var(--accent);
-    font-size: 28px;
-    margin-bottom: 25px;
-}
-
-#bootText {
-    color: #a8b4c4;
-    line-height: 1.7;
-}
-
-.progress {
-    height: 5px;
-    background: #222;
-    margin-top: 25px;
-}
-
-.progressBar {
-    height: 100%;
-    width: 0%;
-    background: var(--accent);
-    transition: width .2s;
-}
-
-/* DESKTOP */
-
-#desktop {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    background:
-        radial-gradient(circle at 70% 20%, #14271f 0%, transparent 25%),
-        radial-gradient(circle at 20% 80%, #101a2b 0%, transparent 30%),
-        #07090d;
-}
-
-/* TOP BAR */
-
-.topbar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 42px;
-    background: rgba(8,11,16,.94);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
-    z-index: 500;
-    font-size: 13px;
-}
-
-.logo {
-    color: var(--accent);
-    font-weight: bold;
-    letter-spacing: 2px;
-}
-
-.status {
-    color: var(--muted);
-}
-
-/* ICONS */
-
-.desktopIcons {
-    position: absolute;
-    top: 65px;
-    left: 20px;
-    display: grid;
-    grid-template-columns: 90px;
-    gap: 22px;
-}
-
-.icon {
-    text-align: center;
-    cursor: pointer;
-    user-select: none;
-}
-
-.iconSymbol {
-    width: 55px;
-    height: 55px;
-    margin: auto;
-    background: rgba(20,27,37,.8);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 27px;
-    transition: .2s;
-}
-
-.icon:hover .iconSymbol {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-}
-
-.iconName {
-    font-size: 12px;
-    margin-top: 7px;
-    color: #b9c4d1;
-}
-
-/* WINDOWS */
-
-.window {
-    position: absolute;
-    width: 620px;
-    max-width: calc(100vw - 40px);
-    min-height: 300px;
-    background: rgba(13,17,24,.97);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    box-shadow: 0 20px 70px rgba(0,0,0,.65);
-    overflow: hidden;
-    display: none;
-}
-
-.window.active {
-    display: block;
-}
-
-.windowHeader {
-    height: 40px;
-    background: #151b24;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 12px;
-    cursor: move;
-    user-select: none;
-}
-
-.windowTitle {
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.windowControls button {
-    width: 27px;
-    height: 25px;
-    padding: 0;
-    margin: 0 0 0 5px;
-    background: #202833;
-    color: white;
-    border: 1px solid #354152;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.windowControls button:hover {
-    background: var(--danger);
-}
-
-.windowBody {
-    padding: 22px;
-    max-height: 65vh;
-    overflow-y: auto;
-}
-
-/* GENERAL */
-
-h2 {
-    margin-top: 0;
-}
-
-.muted {
-    color: var(--muted);
-}
-
-.green {
-    color: var(--accent);
-}
-
-button {
-    background: #202934;
-    color: var(--text);
-    border: 1px solid #394657;
-    border-radius: 6px;
-    padding: 9px 13px;
-    cursor: pointer;
-}
-
-button:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
-
-input {
-    background: #080b10;
-    border: 1px solid #354152;
-    color: white;
-    padding: 11px;
-    border-radius: 6px;
-    outline: none;
-}
-
-input:focus {
-    border-color: var(--accent);
-}
-
-/* FILES */
-
-.fileGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-
-.file {
-    padding: 18px 10px;
-    background: #151b24;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    text-align: center;
-    cursor: pointer;
-}
-
-.file:hover {
-    border-color: var(--accent);
-    background: #18221f;
-}
-
-.fileIcon {
-    font-size: 32px;
-    margin-bottom: 8px;
-}
-
-/* MESSAGES */
-
-.message {
-    border-bottom: 1px solid var(--border);
-    padding: 15px 0;
-}
-
-.message:last-child {
-    border: none;
-}
-
-.sender {
-    color: var(--accent);
-    font-weight: bold;
-}
-
-.time {
-    float: right;
-    color: var(--muted);
-    font-size: 12px;
-}
-
-/* TERMINAL */
-
-.terminal {
-    background: #030505;
-    border: 1px solid #27342d;
-    border-radius: 7px;
-    padding: 18px;
-    font-family: monospace;
-    color: var(--accent);
-    line-height: 1.7;
-}
-
-.terminal input {
-    width: 180px;
-    font-family: monospace;
-}
-
-/* MAP */
-
-.map {
-    height: 320px;
-    background:
-        linear-gradient(90deg, transparent 48%, #26313d 49%, #26313d 51%, transparent 52%),
-        linear-gradient(0deg, transparent 48%, #26313d 49%, #26313d 51%, transparent 52%),
-        #0c1219;
-    position: relative;
-    overflow: hidden;
-}
-
-.location {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    background: var(--accent);
-    border-radius: 50%;
-    box-shadow: 0 0 18px var(--accent);
-    cursor: pointer;
-}
-
-.location.one {
-    left: 25%;
-    top: 30%;
-}
-
-.location.two {
-    left: 68%;
-    top: 60%;
-}
-
-.location.three {
-    left: 48%;
-    top: 78%;
-}
-
-.location:hover {
-    transform: scale(1.4);
-}
-
-/* ACHIEVEMENTS */
-
-.achievement {
-    padding: 14px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    margin-bottom: 10px;
-}
-
-.unlocked {
-    border-color: var(--accent);
-}
-
-.locked {
-    opacity: .45;
-}
-
-/* NOTIFICATION */
-
-#notification {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    width: 300px;
-    background: #121923;
-    border: 1px solid var(--accent);
-    padding: 15px;
-    border-radius: 8px;
-    display: none;
-    z-index: 9000;
-    box-shadow: 0 10px 40px #000;
-}
-
-/* MOBILE */
-
-@media(max-width:700px) {
-
-    .window {
-        left: 10px !important;
-        top: 55px !important;
-        width: calc(100vw - 20px);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Ball Sort FPS</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    .desktopIcons {
-        grid-template-columns: repeat(3, 90px);
-        top: 65px;
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #111;
+      font-family: Arial, sans-serif;
     }
 
-    .fileGrid {
-        grid-template-columns: repeat(2, 1fr);
+    #game {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
     }
 
-}
-</style>
+    /* Crosshair */
+    #crosshair {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #crosshair::before,
+    #crosshair::after {
+      content: "";
+      position: absolute;
+      background: white;
+      box-shadow: 0 0 3px black;
+    }
+
+    #crosshair::before {
+      width: 18px;
+      height: 2px;
+      left: 0;
+      top: 8px;
+    }
+
+    #crosshair::after {
+      width: 2px;
+      height: 18px;
+      left: 8px;
+      top: 0;
+    }
+
+    #hud {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 0 2px 4px black;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    #restart {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 20;
+      padding: 10px 16px;
+      border: 0;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.65);
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    #restart:hover {
+      background: rgba(40, 40, 40, 0.9);
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- BOOT -->
+  <canvas id="game"></canvas>
 
-<div id="boot">
-    <div class="bootBox">
-        <div class="bootTitle">NEON//ARCHIVE</div>
+  <div id="crosshair"></div>
 
-        <div id="bootText">
-            INITIALIZING ARCHIVE SYSTEM...
-        </div>
+  <div id="hud">
+    Sorted: <span id="score">0</span> / 6
+  </div>
 
-        <div class="progress">
-            <div class="progressBar" id="progressBar"></div>
-        </div>
-    </div>
-</div>
+  <button id="restart">Restart</button>
 
+  <script type="module">
+    import * as THREE from
+      "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-<!-- DESKTOP -->
+    const canvas = document.getElementById("game");
+    const scoreText = document.getElementById("score");
+    const restartButton = document.getElementById("restart");
 
-<div id="desktop">
+    // --------------------------------------------------
+    // SCENE
+    // --------------------------------------------------
 
-    <div class="topbar">
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87b8d8);
 
-        <div class="logo">
-            NEON//ARCHIVE
-        </div>
+    scene.fog = new THREE.Fog(0x87b8d8, 35, 100);
 
-        <div class="status">
-            SYSTEM ONLINE　|　USER: UNKNOWN　|　v2.7.14
-        </div>
+    // --------------------------------------------------
+    // CAMERA
+    // --------------------------------------------------
 
-    </div>
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.05,
+      200
+    );
 
+    // --------------------------------------------------
+    // RENDERER
+    // --------------------------------------------------
 
-    <!-- DESKTOP ICONS -->
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true
+    });
 
-    <div class="desktopIcons">
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        <div class="icon" onclick="openWindow('files')">
-            <div class="iconSymbol">📁</div>
-            <div class="iconName">Archive</div>
-        </div>
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-        <div class="icon" onclick="openWindow('messages')">
-            <div class="iconSymbol">💬</div>
-            <div class="iconName">Messages</div>
-        </div>
+    // --------------------------------------------------
+    // LIGHTING
+    // --------------------------------------------------
 
-        <div class="icon" onclick="openWindow('notes')">
-            <div class="iconSymbol">📝</div>
-            <div class="iconName">Notes</div>
-        </div>
+    const ambient = new THREE.HemisphereLight(
+      0xffffff,
+      0x526b78,
+      2.2
+    );
 
-        <div class="icon" onclick="openWindow('map')">
-            <div class="iconSymbol">🗺️</div>
-            <div class="iconName">Map</div>
-        </div>
+    scene.add(ambient);
 
-        <div class="icon" onclick="openWindow('terminal')">
-            <div class="iconSymbol">⌨️</div>
-            <div class="iconName">Terminal</div>
-        </div>
+    const sun = new THREE.DirectionalLight(
+      0xffffff,
+      3
+    );
 
-        <div class="icon" onclick="openWindow('achievements')">
-            <div class="iconSymbol">🏆</div>
-            <div class="iconName">Achievements</div>
-        </div>
+    sun.position.set(15, 25, 10);
+    sun.castShadow = true;
 
-        <div class="icon" onclick="openWindow('settings')">
-            <div class="iconSymbol">⚙️</div>
-            <div class="iconName">Settings</div>
-        </div>
+    sun.shadow.mapSize.width = 2048;
+    sun.shadow.mapSize.height = 2048;
 
-    </div>
+    sun.shadow.camera.left = -40;
+    sun.shadow.camera.right = 40;
+    sun.shadow.camera.top = 40;
+    sun.shadow.camera.bottom = -40;
 
+    scene.add(sun);
 
-    <!-- FILES WINDOW -->
+    // --------------------------------------------------
+    // GROUND
+    // --------------------------------------------------
 
-    <div class="window" id="files" style="left:180px;top:100px;">
+    const groundGeometry = new THREE.BoxGeometry(
+      70,
+      1,
+      70
+    );
 
-        <div class="windowHeader">
-            <span class="windowTitle">📁 ARCHIVE / ROOT</span>
+    const groundMaterial = new THREE.MeshStandardMaterial({
+      color: 0x3d6541,
+      roughness: 0.9
+    });
 
-            <div class="windowControls">
-                <button onclick="closeWindow('files')">×</button>
-            </div>
-        </div>
+    const ground = new THREE.Mesh(
+      groundGeometry,
+      groundMaterial
+    );
 
-        <div class="windowBody">
+    ground.position.y = -0.5;
+    ground.receiveShadow = true;
 
-            <h2>Archive Files</h2>
+    scene.add(ground);
 
-            <p class="muted">
-                7 objects found. Some files may require authorization.
-            </p>
+    // --------------------------------------------------
+    // ARENA WALLS
+    // --------------------------------------------------
 
-            <div class="fileGrid">
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      color: 0x4b5961
+    });
 
-                <div class="file" onclick="openFile('readme')">
-                    <div class="fileIcon">📄</div>
-                    README.txt
-                </div>
+    function createWall(x, y, z, sx, sy, sz) {
+      const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(sx, sy, sz),
+        wallMaterial
+      );
 
-                <div class="file" onclick="openFile('incident')">
-                    <div class="fileIcon">📄</div>
-                    incident.log
-                </div>
+      mesh.position.set(x, y, z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
 
-                <div class="file" onclick="openFile('photo')">
-                    <div class="fileIcon">🖼️</div>
-                    image_07.dat
-                </div>
+      scene.add(mesh);
 
-                <div class="file" onclick="openFile('locked')">
-                    <div class="fileIcon">🔐</div>
-                    ARCHIVE_0
-                </div>
-
-                <div class="file" onclick="openFile('audio')">
-                    <div class="fileIcon">🎵</div>
-                    recording.wav
-                </div>
-
-                <div class="file" onclick="openFile('unknown')">
-                    <div class="fileIcon">❓</div>
-                    unknown.dat
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-
-
-    <!-- MESSAGES -->
-
-    <div class="window" id="messages" style="left:230px;top:130px;">
-
-        <div class="windowHeader">
-            <span class="windowTitle">💬 MESSAGES</span>
-            <div class="windowControls">
-                <button onclick="closeWindow('messages')">×</button>
-            </div>
-        </div>
-
-        <div class="windowBody">
-
-            <div class="message">
-
-                <span class="sender">UNKNOWN_USER</span>
-                <span class="time">23:41</span>
-
-                <p>
-                    If you're reading this, the archive wasn't deleted.
-                </p>
-
-            </div>
-
-            <div class="message">
-
-                <span class="sender">SYSTEM</span>
-                <span class="time">23:42</span>
-
-                <p>
-                    Message integrity: 98%.
-                </p>
-
-            </div>
-
-            <div class="message">
-
-                <span class="sender">UNKNOWN_USER</span>
-                <span class="time">23:43</span>
-
-                <p>
-                    Look for the number hidden in the incident report.
-                </p>
-
-            </div>
-
-            <div class="message">
-
-                <span class="sender">UNKNOWN_USER</span>
-                <span class="time">23:44</span>
-
-                <p>
-                    Don't trust the obvious answer.
-                </p>
-
-            </div>
-
-        </div>
-    </div>
-
-
-    <!-- NOTES -->
-
-    <div class="window" id="notes" style="left:280px;top:160px;">
-
-        <div class="windowHeader">
-
-            <span class="windowTitle">📝 NOTES</span>
-
-            <div class="windowControls">
-                <button onclick="closeWindow('notes')">×</button>
-            </div>
-
-        </div>
-
-        <div class="windowBody">
-
-            <h2>Investigation Notes</h2>
-
-            <p>
-                The system seems to contain information that someone
-                wanted hidden.
-            </p>
-
-            <p>
-                Three locations appear on the map.
-            </p>
-
-            <p>
-                The archive folder contains several corrupted files.
-            </p>
-
-            <p class="green">
-                NOTE: "Numbers are more important than names."
-            </p>
-
-        </div>
-    </div>
-
-
-    <!-- MAP -->
-
-    <div class="window" id="map" style="left:330px;top:120px;">
-
-        <div class="windowHeader">
-
-            <span class="windowTitle">🗺️ NETWORK MAP</span>
-
-            <div class="windowControls">
-                <button onclick="closeWindow('map')">×</button>
-            </div>
-
-        </div>
-
-        <div class="windowBody">
-
-            <p class="muted">
-                Three archived locations detected.
-            </p>
-
-            <div class="map">
-
-                <div class="location one"
-                     onclick="locationMessage('NORTH NODE')">
-                </div>
-
-                <div class="location two"
-                     onclick="locationMessage('EAST NODE')">
-                </div>
-
-                <div class="location three"
-                     onclick="locationMessage('CENTRAL NODE')">
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-
-
-    <!-- TERMINAL -->
-
-    <div class="window" id="terminal" style="left:380px;top:180px;">
-
-        <div class="windowHeader">
-
-            <span class="windowTitle">⌨️ TERMINAL</span>
-
-            <div class="windowControls">
-                <button onclick="closeWindow('terminal')">×</button>
-            </div>
-
-        </div>
-
-        <div class="windowBody">
-
-            <div class="terminal">
-
-                NEON TERMINAL v4.2<br>
-                -----------------------<br>
-                CONNECTION: ACTIVE<br>
-                ARCHIVE: MOUNTED<br>
-                <br>
-
-                Type HELP for available commands.<br><br>
-
-                <input id="terminalInput"
-                       placeholder="command"
-                       onkeydown="terminalCommand(event)">
-
-                <div id="terminalOutput"></div>
-
-            </div>
-
-        </div>
-    </div>
-
-
-    <!-- ACHIEVEMENTS -->
-
-    <div class="window" id="achievements" style="left:420px;top:100px;">
-
-        <div class="windowHeader">
-
-            <span class="windowTitle">🏆 ACHIEVEMENTS</span>
-
-            <div class="windowControls">
-                <button onclick="closeWindow('achievements')">×</button>
-            </div>
-
-        </div>
-
-        <div class="windowBody">
-
-            <div class="achievement unlocked">
-                <b>FIRST LOGIN</b>
-                <br>
-                <span class="muted">Boot the archive system.</span>
-            </div>
-
-            <div class="achievement" id="achievementFile">
-                <b>FILE EXPLORER</b>
-                <br>
-                <span class="muted">Open your first archive file.</span>
-            </div>
-
-            <div class="achievement" id="achievementSecret">
-                <b>DEEP DIVE</b>
-                <br>
-                <span class="muted">Discover a hidden secret.</span>
-            </div>
-
-            <div class="achievement" id="achievementPassword">
-                <b>AUTHORIZED</b>
-                <br>
-                <span class="muted">Unlock ARCHIVE_0.</span>
-            </div>
-
-        </div>
-    </div>
-
-
-    <!-- SETTINGS -->
-
-    <div class="window" id="settings" style="left:460px;top:140px;">
-
-        <div class="windowHeader">
-
-            <span class="windowTitle">⚙️ SETTINGS</span>
-
-            <div class="windowControls">
-                <button onclick="closeWindow('settings')">×</button>
-            </div>
-
-        </div>
-
-        <div class="windowBody">
-
-            <h2>System Settings</h2>
-
-            <p>
-                Interface version:
-                <span class="green">2.7.14</span>
-            </p>
-
-            <p>
-                Storage:
-                <span class="green">87% available</span>
-            </p>
-
-            <hr>
-
-            <button onclick="saveGame()">
-                SAVE PROGRESS
-            </button>
-
-            <button onclick="resetGame()">
-                RESET GAME
-            </button>
-
-        </div>
-    </div>
-
-</div>
-
-
-<!-- NOTIFICATION -->
-
-<div id="notification"></div>
-
-
-<script>
-
-/* =========================
-   GAME DATA
-========================= */
-
-let game = {
-
-    filesOpened: 0,
-    secretFound: false,
-    passwordUnlocked: false
-
-};
-
-
-/* =========================
-   BOOT SEQUENCE
-========================= */
-
-let progress = 0;
-
-let bootMessages = [
-    "INITIALIZING ARCHIVE SYSTEM...",
-    "CHECKING MEMORY...",
-    "CONNECTING TO LOCAL ARCHIVE...",
-    "VERIFYING USER...",
-    "USER: UNKNOWN",
-    "LOADING INTERFACE...",
-    "SYSTEM READY."
-];
-
-let bootInterval = setInterval(() => {
-
-    progress += 14;
-
-    document.getElementById("progressBar").style.width =
-        Math.min(progress,100) + "%";
-
-    let index = Math.floor(progress / 14);
-
-    if (bootMessages[index]) {
-        document.getElementById("bootText").innerHTML =
-            bootMessages[index];
+      return mesh;
     }
 
-    if (progress >= 100) {
+    createWall(0, 2, -35, 70, 4, 1);
+    createWall(0, 2, 35, 70, 4, 1);
+    createWall(-35, 2, 0, 1, 4, 70);
+    createWall(35, 2, 0, 1, 4, 70);
 
-        clearInterval(bootInterval);
+    // --------------------------------------------------
+    // BALL COLORS
+    // --------------------------------------------------
 
-        setTimeout(() => {
+    const colors = [
+      0xff3b30, // red
+      0x2196f3, // blue
+      0xffd400, // yellow
+      0x34c759, // green
+      0xff7a00, // orange
+      0xaf52de  // purple
+    ];
 
-            document.getElementById("boot").style.display = "none";
+    // --------------------------------------------------
+    // SORTING ZONES
+    // --------------------------------------------------
 
-        },500);
+    const zones = [];
 
+    const zonePositions = [
+      [-20, -20],
+      [-7, -20],
+      [7, -20],
+      [20, -20],
+      [-7, 20],
+      [7, 20]
+    ];
+
+    for (let i = 0; i < colors.length; i++) {
+
+      const color = colors[i];
+
+      const base = new THREE.Mesh(
+        new THREE.CylinderGeometry(3.2, 3.2, 0.25, 48),
+        new THREE.MeshStandardMaterial({
+          color,
+          roughness: 0.7
+        })
+      );
+
+      base.position.set(
+        zonePositions[i][0],
+        0.13,
+        zonePositions[i][1]
+      );
+
+      base.receiveShadow = true;
+      scene.add(base);
+
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(3.1, 0.16, 12, 48),
+        new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          emissive: color,
+          emissiveIntensity: 0.25
+        })
+      );
+
+      ring.rotation.x = Math.PI / 2;
+
+      ring.position.set(
+        zonePositions[i][0],
+        0.32,
+        zonePositions[i][1]
+      );
+
+      scene.add(ring);
+
+      zones.push({
+        x: zonePositions[i][0],
+        z: zonePositions[i][1],
+        color,
+        index: i
+      });
     }
 
-},400);
+    // --------------------------------------------------
+    // BALLS
+    // --------------------------------------------------
 
+    const balls = [];
 
-/* =========================
-   WINDOWS
-========================= */
+    function createBall(index) {
 
-let highestZ = 600;
+      const geometry = new THREE.SphereGeometry(
+        1,
+        32,
+        24
+      );
 
-function openWindow(id) {
+      const material = new THREE.MeshStandardMaterial({
+        color: colors[index],
+        roughness: 0.35,
+        metalness: 0.05
+      });
 
-    let win = document.getElementById(id);
+      const ball = new THREE.Mesh(
+        geometry,
+        material
+      );
 
-    win.classList.add("active");
+      const angle = index * 1.05;
 
-    highestZ++;
+      ball.position.set(
+        Math.cos(angle) * 12,
+        2,
+        Math.sin(angle) * 12
+      );
 
-    win.style.zIndex = highestZ;
+      ball.castShadow = true;
+      ball.receiveShadow = true;
 
-}
+      scene.add(ball);
 
-function closeWindow(id) {
+      balls.push({
+        mesh: ball,
+        colorIndex: index,
+        velocity: new THREE.Vector3(
+          (Math.random() - 0.5) * 2,
+          0,
+          (Math.random() - 0.5) * 2
+        ),
+        active: true
+      });
+    }
 
-    document.getElementById(id)
-        .classList.remove("active");
+    for (let i = 0; i < colors.length; i++) {
+      createBall(i);
+    }
 
-}
+    // --------------------------------------------------
+    // PLAYER
+    // --------------------------------------------------
 
+    let playerX = 0;
+    let playerY = 1.7;
+    let playerZ = 8;
 
-/* =========================
-   DRAGGING WINDOWS
-========================= */
+    let velocityY = 0;
 
-document.querySelectorAll(".window").forEach(win => {
+    const playerHeight = 1.7;
 
-    let header = win.querySelector(".windowHeader");
+    const moveSpeed = 9;
+    const jumpPower = 9;
 
-    let dragging = false;
-    let offsetX = 0;
-    let offsetY = 0;
+    let yaw = 0;
+    let pitch = 0;
 
-    header.addEventListener("mousedown", e => {
+    let locked = false;
 
-        dragging = true;
+    // --------------------------------------------------
+    // KEYBOARD
+    // --------------------------------------------------
 
-        offsetX = e.clientX - win.offsetLeft;
-        offsetY = e.clientY - win.offsetTop;
+    const keys = {};
 
-        highestZ++;
-        win.style.zIndex = highestZ;
+    window.addEventListener("keydown", e => {
+
+      keys[e.code] = true;
+
+      if (
+        e.code === "Space" &&
+        playerY <= playerHeight + 0.05
+      ) {
+        velocityY = jumpPower;
+      }
+    });
+
+    window.addEventListener("keyup", e => {
+      keys[e.code] = false;
+    });
+
+    // --------------------------------------------------
+    // MOUSE LOOK
+    // --------------------------------------------------
+
+    canvas.addEventListener("click", () => {
+
+      if (document.pointerLockElement !== canvas) {
+        canvas.requestPointerLock();
+      }
 
     });
 
-    document.addEventListener("mousemove", e => {
+    document.addEventListener(
+      "pointerlockchange",
+      () => {
 
-        if (!dragging) return;
+        locked =
+          document.pointerLockElement === canvas;
 
-        win.style.left =
-            (e.clientX - offsetX) + "px";
+      }
+    );
 
-        win.style.top =
-            (e.clientY - offsetY) + "px";
+    document.addEventListener(
+      "mousemove",
+      e => {
 
-    });
+        if (!locked) return;
 
-    document.addEventListener("mouseup", () => {
+        yaw -= e.movementX * 0.0022;
+        pitch -= e.movementY * 0.0022;
 
-        dragging = false;
-
-    });
-
-});
-
-
-/* =========================
-   FILES
-========================= */
-
-function openFile(type) {
-
-    game.filesOpened++;
-
-    document.getElementById("achievementFile")
-        .classList.add("unlocked");
-
-    if (type === "readme") {
-
-        notify(
-            "README.txt: Welcome to NEON//ARCHIVE. " +
-            "If you found this, you're already deeper than most."
+        pitch = THREE.MathUtils.clamp(
+          pitch,
+          -1.45,
+          1.45
         );
 
-    }
+      }
+    );
 
-    else if (type === "incident") {
+    // --------------------------------------------------
+    // BALL PHYSICS
+    // --------------------------------------------------
 
-        notify(
-            "incident.log: 03:17 — ARCHIVE ACCESS DETECTED. " +
-            "A number appears repeatedly: 2714."
+    function updateBalls(dt) {
+
+      for (const ball of balls) {
+
+        if (!ball.active) continue;
+
+        const mesh = ball.mesh;
+
+        // Gravity
+        ball.velocity.y -= 18 * dt;
+
+        mesh.position.addScaledVector(
+          ball.velocity,
+          dt
         );
 
-    }
+        // Floor
+        if (mesh.position.y < 1) {
 
-    else if (type === "photo") {
+          mesh.position.y = 1;
 
-        notify(
-            "image_07.dat appears corrupted. " +
-            "Metadata: NODE-07."
-        );
-
-    }
-
-    else if (type === "audio") {
-
-        notify(
-            "recording.wav: AUDIO DATA UNAVAILABLE."
-        );
-
-    }
-
-    else if (type === "unknown") {
-
-        game.secretFound = true;
-
-        document.getElementById("achievementSecret")
-            .classList.add("unlocked");
-
-        notify(
-            "UNKNOWN.DAT contains one readable line: " +
-            "LOOK UNDER THE SYSTEM."
-        );
-
-    }
-
-    else if (type === "locked") {
-
-        if (game.passwordUnlocked) {
-
-            notify(
-                "ARCHIVE_0 unlocked. " +
-                "You've reached the deepest layer."
-            );
-
-        } else {
-
-            let password = prompt(
-                "ARCHIVE_0 requires authorization.\n\n" +
-                "Hint: The incident report contains the number."
-            );
-
-            if (password === "2714") {
-
-                game.passwordUnlocked = true;
-
-                document.getElementById("achievementPassword")
-                    .classList.add("unlocked");
-
-                notify(
-                    "ACCESS GRANTED. ARCHIVE_0 UNLOCKED."
-                );
-
-            } else {
-
-                notify("ACCESS DENIED.");
-
-            }
+          if (ball.velocity.y < 0) {
+            ball.velocity.y *= -0.35;
+          }
 
         }
 
+        // Arena boundaries
+        const limit = 33;
+
+        if (mesh.position.x < -limit) {
+          mesh.position.x = -limit;
+          ball.velocity.x *= -0.5;
+        }
+
+        if (mesh.position.x > limit) {
+          mesh.position.x = limit;
+          ball.velocity.x *= -0.5;
+        }
+
+        if (mesh.position.z < -limit) {
+          mesh.position.z = -limit;
+          ball.velocity.z *= -0.5;
+        }
+
+        if (mesh.position.z > limit) {
+          mesh.position.z = limit;
+          ball.velocity.z *= -0.5;
+        }
+
+        // Friction
+        ball.velocity.x *= Math.pow(0.35, dt);
+        ball.velocity.z *= Math.pow(0.35, dt);
+
+        // Player pushes balls
+        const dx =
+          mesh.position.x - playerX;
+
+        const dz =
+          mesh.position.z - playerZ;
+
+        const horizontalDistance =
+          Math.sqrt(dx * dx + dz * dz);
+
+        if (
+          horizontalDistance < 2.1 &&
+          mesh.position.y < 3
+        ) {
+
+          const push =
+            Math.max(
+              0.1,
+              2.1 - horizontalDistance
+            );
+
+          if (horizontalDistance > 0.001) {
+
+            ball.velocity.x +=
+              (dx / horizontalDistance) *
+              push *
+              7 *
+              dt;
+
+            ball.velocity.z +=
+              (dz / horizontalDistance) *
+              push *
+              7 *
+              dt;
+
+          }
+
+        }
+
+        // Check matching zone
+        for (const zone of zones) {
+
+          const zx =
+            mesh.position.x - zone.x;
+
+          const zz =
+            mesh.position.z - zone.z;
+
+          const distance =
+            Math.sqrt(zx * zx + zz * zz);
+
+          if (
+            ball.colorIndex === zone.index &&
+            distance < 2.8 &&
+            mesh.position.y < 2
+          ) {
+
+            ball.active = false;
+
+            scene.remove(mesh);
+
+            scoreText.textContent =
+              Number(scoreText.textContent) + 1;
+
+            break;
+          }
+        }
+      }
     }
 
-}
+    // --------------------------------------------------
+    // PLAYER MOVEMENT
+    // --------------------------------------------------
 
+    function updatePlayer(dt) {
 
-/* =========================
-   MAP
-========================= */
+      let forward = 0;
+      let strafe = 0;
 
-function locationMessage(name) {
+      if (keys["KeyW"] || keys["ArrowUp"]) {
+        forward += 1;
+      }
 
-    notify(
-        name + " detected. Coordinates archived."
+      if (keys["KeyS"] || keys["ArrowDown"]) {
+        forward -= 1;
+      }
+
+      if (keys["KeyD"] || keys["ArrowRight"]) {
+        strafe += 1;
+      }
+
+      if (keys["KeyA"] || keys["ArrowLeft"]) {
+        strafe -= 1;
+      }
+
+      const length =
+        Math.sqrt(
+          forward * forward +
+          strafe * strafe
+        );
+
+      if (length > 0) {
+
+        forward /= length;
+        strafe /= length;
+
+        // Camera-relative movement
+        const forwardX = -Math.sin(yaw);
+        const forwardZ = -Math.cos(yaw);
+
+        const rightX = Math.cos(yaw);
+        const rightZ = -Math.sin(yaw);
+
+        playerX +=
+          (
+            forwardX * forward +
+            rightX * strafe
+          ) *
+          moveSpeed *
+          dt;
+
+        playerZ +=
+          (
+            forwardZ * forward +
+            rightZ * strafe
+          ) *
+          moveSpeed *
+          dt;
+      }
+
+      // Gravity
+      velocityY -= 22 * dt;
+
+      playerY += velocityY * dt;
+
+      // Ground
+      if (playerY < playerHeight) {
+
+        playerY = playerHeight;
+        velocityY = 0;
+
+      }
+
+      // Keep player inside arena
+      playerX = THREE.MathUtils.clamp(
+        playerX,
+        -32,
+        32
+      );
+
+      playerZ = THREE.MathUtils.clamp(
+        playerZ,
+        -32,
+        32
+      );
+
+      // Camera
+      camera.position.set(
+        playerX,
+        playerY,
+        playerZ
+      );
+
+      camera.rotation.set(
+        pitch,
+        yaw,
+        0,
+        "YXZ"
+      );
+    }
+
+    // --------------------------------------------------
+    // RESTART
+    // --------------------------------------------------
+
+    restartButton.addEventListener(
+      "click",
+      () => {
+
+        for (const ball of balls) {
+          scene.remove(ball.mesh);
+        }
+
+        balls.length = 0;
+
+        for (let i = 0; i < colors.length; i++) {
+          createBall(i);
+        }
+
+        playerX = 0;
+        playerY = playerHeight;
+        playerZ = 8;
+
+        velocityY = 0;
+
+        yaw = 0;
+        pitch = 0;
+
+        scoreText.textContent = "0";
+
+      }
     );
 
-}
+    // --------------------------------------------------
+    // RESIZE
+    // --------------------------------------------------
 
+    window.addEventListener(
+      "resize",
+      () => {
 
-/* =========================
-   TERMINAL
-========================= */
+        camera.aspect =
+          window.innerWidth /
+          window.innerHeight;
 
-function terminalCommand(event) {
+        camera.updateProjectionMatrix();
 
-    if (event.key !== "Enter") return;
+        renderer.setSize(
+          window.innerWidth,
+          window.innerHeight
+        );
 
-    let input =
-        document.getElementById("terminalInput");
-
-    let output =
-        document.getElementById("terminalOutput");
-
-    let command =
-        input.value.toLowerCase().trim();
-
-    input.value = "";
-
-    if (command === "help") {
-
-        output.innerHTML +=
-            "<br>> AVAILABLE COMMANDS:" +
-            "<br>> help" +
-            "<br>> status" +
-            "<br>> clear" +
-            "<br>> archive";
-
-    }
-
-    else if (command === "status") {
-
-        output.innerHTML +=
-            "<br>> SYSTEM: ONLINE" +
-            "<br>> ARCHIVE: MOUNTED" +
-            "<br>> SECURITY: ACTIVE";
-
-    }
-
-    else if (command === "archive") {
-
-        output.innerHTML +=
-            "<br>> ARCHIVE STATUS: LOCKED" +
-            "<br>> AUTHORIZATION REQUIRED";
-
-    }
-
-    else if (command === "clear") {
-
-        output.innerHTML = "";
-
-    }
-
-    else if (command === "neon") {
-
-        game.secretFound = true;
-
-        document.getElementById("achievementSecret")
-            .classList.add("unlocked");
-
-        output.innerHTML +=
-            "<br>> SECRET COMMAND ACCEPTED." +
-            "<br>> YOU FOUND SOMETHING.";
-
-    }
-
-    else {
-
-        output.innerHTML +=
-            "<br>> COMMAND NOT FOUND: " + command;
-
-    }
-
-}
-
-
-/* =========================
-   NOTIFICATIONS
-========================= */
-
-function notify(message) {
-
-    let box =
-        document.getElementById("notification");
-
-    box.innerHTML = message;
-
-    box.style.display = "block";
-
-    setTimeout(() => {
-
-        box.style.display = "none";
-
-    },4000);
-
-}
-
-
-/* =========================
-   SAVE SYSTEM
-========================= */
-
-function saveGame() {
-
-    localStorage.setItem(
-        "neonArchiveSave",
-        JSON.stringify(game)
+      }
     );
 
-    notify("PROGRESS SAVED.");
+    // --------------------------------------------------
+    // GAME LOOP
+    // --------------------------------------------------
 
-}
+    let lastTime = performance.now();
 
+    function animate(now) {
 
-function loadGame() {
+      requestAnimationFrame(animate);
 
-    let saved =
-        localStorage.getItem("neonArchiveSave");
+      const dt =
+        Math.min(
+          (now - lastTime) / 1000,
+          0.05
+        );
 
-    if (!saved) return;
+      lastTime = now;
 
-    game = JSON.parse(saved);
+      updatePlayer(dt);
+      updateBalls(dt);
 
-    if (game.secretFound) {
-
-        document.getElementById("achievementSecret")
-            .classList.add("unlocked");
-
+      renderer.render(
+        scene,
+        camera
+      );
     }
 
-    if (game.passwordUnlocked) {
+    animate(performance.now());
 
-        document.getElementById("achievementPassword")
-            .classList.add("unlocked");
-
-    }
-
-}
-
-
-/* =========================
-   RESET
-========================= */
-
-function resetGame() {
-
-    if (!confirm(
-        "Reset all NEON//ARCHIVE progress?"
-    )) return;
-
-    localStorage.removeItem(
-        "neonArchiveSave"
-    );
-
-    location.reload();
-
-}
-
-
-/* =========================
-   START
-========================= */
-
-loadGame();
-
-</script>
+  </script>
 
 </body>
 </html>
